@@ -1,0 +1,16 @@
+{
+  "name": "getting-started-with-webassembly",
+  "version": "1.0.0",
+  "description": "Getting Started with WebAssembly Course Code",
+  "main": "server.js",
+  "repository": "https://github.com/StanMc/WebAssembly.git",
+  "author": "Stanley McDaniel <stan.mcdaniel@gmail.com>",
+  "license": "MIT",
+  "scripts":{
+    "start": "node server.js",
+    "test1":  "echo 'This is a test'"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
