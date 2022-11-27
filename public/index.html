@@ -10,8 +10,41 @@
     <h1>WebAssembly Demo</h1>
     <script>
         // WebAssembly code... 
+        
+        // Read a string out of Web Assembly
+        const readMemStr = (offset, length) => {
+            const strBuffer = new Uint8Array(wasm.instance.exports.memory.buffer,
+                                            offset,
+                                            length)
+            const str = new TextDecoder().decode(strBuffer)
+            
+            // This console log isn't really allowing the JS to use the string.
+            // It is really just being used by the WASM.  Therefore, we'll use
+            // notification in a couple of lines lower. 
+            console.log(str) 
+
+            // Notify and make use of the new string
+            window.dispatchEvent(new CustomEvent('wasmValue', {detail: str}))
+        }
+
+        // Notification/Event handler.  In this case we will be listening 
+        // specifically for the WASM strings event dispatched above
+        window.addEventListener('wasmValue', str => {
+            console.log('Received a new string from C:', str.detail)
+        })
+
+        // Import object.  Remember, it is "import" from the C program's perspective.  "Export" is from the 
+        // C program's perspective as well.  Remember, the naming is backwards when it comes to "import" and "export"
+        const imports = {
+            env: {
+                intLog:  console.log,
+                strLog:  readMemStr,
+                consoleMemory: console.log
+            }
+        }
+        
         // Load WASM
-        WebAssembly.instantiateStreaming(fetch('/program.wasm'))
+        WebAssembly.instantiateStreaming(fetch('/program.wasm'), imports)
             .then( wasm => {
                 console.log('WASM Ready');
 
@@ -20,9 +53,15 @@
 
                 // log out all the exported functions
                 console.log(WebAssembly.Module.exports(wasm.module));
+                // log out all the imported functions
+                console.log(WebAssembly.Module.imports(wasm.module));
 
-                // Call our new double function
+                // Call our new double function.  It bring functionality INTO our module from WASM
                 console.log(wasm.instance.exports.getDoubleNumber(80));
+
+                // Log out all exported functions
+                wasm.instance.exports.getTripleNumber(93);
+
             })       
     </script>
 </body>
