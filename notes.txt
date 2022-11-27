@@ -1,0 +1,4 @@
+wasm % emcc lib/demo.c -s WASM=1 -s EXPORTED_FUNCTIONS="['_getNum', '_getDoubleNum', '_main']" -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -o public/demo.js
+ccall('greet', 'string')
+ccall('getDoubleNum', 'number', 'number', [34324])
+ccall('greet', 'string', ['string'], ['Stanley']) 
