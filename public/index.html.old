@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAssembly Demo</title>
+</head>
+<body>
+    <h1>WebAssembly Demo</h1>
+    <script>
+        // WebAssembly code... 
+        
+        // Originally we simply used the memory that was passed to us by the 
+        // C program via WASM.  That is in general a bad practice.  It would be
+        // better for us to allocate our own memory and have the C program use
+        // that memory.
+        // Remember 1 page equals 64kb.  So, 20 pages = 1.25mb
+        const wasmMemory = new WebAssembly.Memory({initial: 2})
+
+        // Read a string out of Web Assembly
+        const readMemStr = (offset, length) => {
+            const strBuffer = new Uint8Array(wasmMemory.buffer, /*wasm.instance.exports.memory.buffer*/
+                                            offset,
+                                            length)
+            const str = new TextDecoder().decode(strBuffer)
+            
+            // This console log isn't really allowing the JS to use the string.
+            // It is really just being used by the WASM.  Therefore, we'll use
+            // notification in a couple of lines lower. 
+            console.log(str) 
+
+            // Notify and make use of the new string
+            window.dispatchEvent(new CustomEvent('wasmValue', {detail: str}))
+        }
+
+        // Notification/Event handler.  In this case we will be listening 
+        // specifically for the WASM strings event dispatched above
+        window.addEventListener('wasmValue', str => {
+            console.log('The browser received a new string from C:', str.detail)
+        })
+
+        // Import object.  Remember, it is "import" from the C program's perspective.  "Export" is from the 
+        // C program's perspective as well.  Remember, the naming is backwards when it comes to "import" and "export"
+        const imports = {
+            env: {
+                intLog:  console.log,
+                strLog:  readMemStr,
+                consoleMemory: console.log,
+                memory: wasmMemory
+            }
+        }
+        
+        // Load WASM
+        WebAssembly.instantiateStreaming(fetch('/program.wasm'), imports)
+            .then( wasm => {
+                console.log('WASM Ready');
+
+                // Make the wasm object assesible
+                window.wasm  = wasm
+
+                // log out all the exported functions
+                console.log(WebAssembly.Module.exports(wasm.module));
+                // log out all the imported functions
+                console.log(WebAssembly.Module.imports(wasm.module));
+
+                // Call our new double function.  It bring functionality INTO our module from WASM
+                console.log(wasm.instance.exports.getDoubleNumber(80));
+
+                // Log out all exported functions
+                wasm.instance.exports.getTripleNumber(93);
+
+            })       
+    </script>
+</body>
+</html>
