@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <emscripten.h>
 
 int main(){
     printf("WASM Ready - Testing with Emscripten with HTML. Nov 27, 2022\n");

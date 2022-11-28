@@ -8,10 +8,36 @@
 </head>
 <body>
     <h1>WebAssembly Demo</h1>
-    <script src="demo.js"> </script>
+    <!-- <script src="imports.js"> </script> -->
+    <script src="strings.js"> </script>
+    <!-- <script> console.log(Module); </script> -->
+
+    <script>
+    // Wait for WASM (Emscripten) runtime to be ready 
+    Module['onRuntimeInitialized'] = () => {
+        console.log("Runtime Ready");
+        console.log( _getStr() ); 
+    }
+    </script>
+
+    <!-- 
+   <script> 
+        // Return a usable val to C
+        function getNum(){
+            return 22; 
+        }
+
+         // Return a usable string val to C
+         function getString(){
+            return "Hello Stan from JS"; 
+        }
+    </script>
+   
+    <script src="demo.js"> </script> 
     <script>
         // Wrap C _greet as a JS function
         const greet = cwrap('greet', 'string', ['string'])
     </script>
+    -->
 </body>
 </html>
