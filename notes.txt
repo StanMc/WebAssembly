@@ -4,3 +4,7 @@ ccall('getDoubleNum', 'number', 'number', [34324])
 ccall('greet', 'string', ['string'], ['Stanley']) 
 
 UTF8ToString(_getStr())
+
+emcc lib/strings.c -s WASM=1 -s EXPORTED_FUNCTIONS="['_getStr', '_getNumber', '_main']" -o public/strings.js
+emcc lib/prime.c -s WASM=1 -s EXPORTED_FUNCTIONS="['_isPrime']" -o public/prime.js
+
