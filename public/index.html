@@ -31,16 +31,18 @@
                 var hex = c.toString(16);
                 return hex.length == 1 ? "0" + hex : hex;
             }
-
             function rgbToHex(r, g, b) {
                 return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
             }
 
-
        
             // Get circle data from C - Typed Array
-            let circles = new Int32Array(Module.asm.memory.buffer, _getCircles(), dataLength)
+            let circles = new Int32Array(Module.asm.memory.buffer, _getCircles(canvas.width, canvas.height), dataLength)
             console.log(circles)
+
+            // Clear the canvas to re-render
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
 
             // Loop data and get circle chunks
             for (let i=0; i < circles.length; i+=circleStructSize){
@@ -56,7 +58,9 @@
             }
 
             // Request next animation frame and re-render with updated circles. 
-            // window.requestAnimationFrame(render)
+            window.requestAnimationFrame( () => {
+                render(dataLength,circleStructSize);
+            })
 
 
             console.log('render():  exit')
