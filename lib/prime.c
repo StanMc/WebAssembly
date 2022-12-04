@@ -6,3 +6,13 @@ int isPrime(int num) {
     return (num != 1 && num != 0) ? 1 : 0;   
 }
         
+ // Check numbers 0 to {primes}
+int checkPrimes(int num){
+    int count = 0;
+    for (int i= 0; i < num; i++){
+        if (isPrime(i)) {
+            count++;
+        }
+    }
+    return count;
+}
